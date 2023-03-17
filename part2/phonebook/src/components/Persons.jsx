@@ -1,8 +1,9 @@
-const Persons =({searchTerm,searchResults,persons})=>{
+import Person from "./Person";
+const Persons =({searchTerm,searchResults,persons,handleDelete})=>{
     return (
-          searchTerm ===''?persons.map((person,i) => <p key={i}>{person.name} : {person.number}</p>) :
+          searchTerm ===''?persons.map((person) => <Person person={person} key={person.id} handleDelete={handleDelete}/>) :
                       searchResults ===[] ?<p>No Result Found</p> : 
-                      searchResults.map((person,i) => <p key={i}>{person.name} :{person.number}</p>)
+                      searchResults.map((person) => <Person person={person} key={person.id} handleDelete={handleDelete}/>)
     )
 }
 export default Persons;

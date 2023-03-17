@@ -2,7 +2,7 @@ import { useState ,useEffect } from 'react'
 import AddForm from './components/AddForm';
 import Filter from './components/Filter';
 import Persons from './components/Persons';
-import axios from 'axios';
+import contactsService from './services/contacts';
 const App = () => {
   const [persons, setPersons] = useState([]) 
   const [newName,setNewName]=useState('');
@@ -24,17 +24,28 @@ const App = () => {
     event.preventDefault()
     const names =persons.map(persons => persons.name);
     if(names.includes(newName)){
-      alert( `${newName} is already added to the phonebook`)
+      const person=persons.find(person => person.name ===newName);
+      if(person.number===newNumber){
+        alert( `${newName} is already added to the phonebook with same number`)
+      }else{
+        if(window.confirm(`${person.name} is already added to the phonebook ,replace the old number with ${newNumber}`)){
+          contactsService.update(person.id,{...person,number:newNumber})
+          setNewName('');setNewNumber('');
+        }
+      }   
     }else{
-      setPersons([...persons,{name:newName,number:newNumber}])
+      contactsService.create({name:newName,number:newNumber}).then((newContact)=>{
+        setPersons(persons.concat(newContact));
+      })
       setNewName('');setNewNumber('');
     }
   }
+  const handleDelete=(id)=>{
+    contactsService.remove(id);
+  }
   useEffect(()=>{
-    axios.get('http://localhost:3001/persons').then(response =>{
-      setPersons(response.data)
-    })
-  },[])
+   contactsService.getAll().then(initialPersons =>setPersons(initialPersons))
+  },[persons])
   return (
     <div>
       <h2>Phonebook</h2>
@@ -42,7 +53,7 @@ const App = () => {
       <h3>Add a new</h3>
       <AddForm newName={newName} newNumber={newNumber} handleNameChange={handleNameChange} handlePhoneChange={handlePhoneChange} handleAddPerson={handleAddPerson}/>
       <h2>Numbers</h2>  
-      <Persons searchTerm={searchTerm} searchResults={searchResults} persons={persons} />
+      <Persons searchTerm={searchTerm} searchResults={searchResults} persons={persons} handleDelete={handleDelete}/>
       </div>
   )
 }
