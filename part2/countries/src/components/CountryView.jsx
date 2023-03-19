@@ -2,7 +2,7 @@ import { useState } from "react";
 import weatherService from "../services/weather";
 const CountryView = ({country}) =>{
     const [weather,setWeather]=useState(null);
-    const iconUrl ='';
+    let iconUrl ='';
         weatherService.getWeather(country.capital[0]).then((weather)=>{
             setWeather(weather);
             iconUrl = `https://openweathermap.org/img/wn/${weather.weather[0].icon}@2x.png`
